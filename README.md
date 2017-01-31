@@ -6,4 +6,4 @@ Clone this repo > npm install > execute command gulp serve-static (creates local
 
 Now
 
-Go to www.cloudapp.com > Login > Create blank Word Doc > Insert tab > Office AddIns > my Addins > upload manifest...xml file from project
+Go to www.napacloudapp.com > Login > Create blank Word Doc > Insert tab > Office AddIns > my Addins > upload manifest...xml file from project
