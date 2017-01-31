@@ -5,21 +5,78 @@
         <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
         <title>Boilerplate text app</title>
         <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.4.min.js"></script>
+        <script type="text/javascript" src="https://www.moxtra.com/api/js/moxtra-latest.js" id="moxtrajs" data-client-id="idYPoQqApbs"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/hmac-sha256.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/md5.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/enc-base64-min.js"></script>
         <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js" type="text/javascript"></script>
         <script src="home.js" type="text/javascript"></script>
         </head>
-        <body>
-            <div>
-                    <h1>Welcome</h1>
-            </div>
-            <div>
-                    <p>This sample shows how to add boilerplate text to a document by using the Word JavaScript API.</p>
-                    <br />
-                    <h3>Try it out</h3>
-                    <button id="emerson">Add quote from Ralph Waldo Emerson</button>
-                    <button id="checkhov">Add quote from Anton Chekhov</button>
-                    <button id="proverb">Add Chinese proverb</button>
-            </div>
-            <h3><div id="supportedVersion"/></h3>
-        </body>
+               <!-- Create Signature -->
+        <script type="text/javascript">// <![CDATA[
+            var client_id = "idYPoQqApbs";
+            var client_secret = "r7LX7GEP62E";
+            var timestamp = new Date().getTime();
+            var unique_id = "test12344"; //Unique ID of how user is identified in your system
+            
+            var hash = CryptoJS.HmacSHA256(client_id + unique_id + timestamp, client_secret);
+            var hashInBase64 = CryptoJS.enc.Base64.stringify(hash);
+            var signature = hashInBase64.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, '');
+            // ]]>
+        </script>
+        
+        <!-- Initialize user and get access token -->
+        <script type="text/javascript">
+            function get_token() {
+                var init_options = {
+                    mode:"sandbox",
+                    uniqueid: unique_id,
+                    firstname: "John",
+                    lastname: "Doe",
+                    timestamp: timestamp,
+                    signature: signature,
+                    get_accesstoken: function(result) {
+                        console.log("access_token: " + result.access_token + " expires in: " + result.expires_in);
+                        start_meet(result.access_token);
+                    },
+                    error: function(result) {
+                        console.log("error code: " + result.error_code + " message: " + result.error_message);
+                    }
+                };
+                Moxtra.setup(init_options);
+            }
+        </script>
+ 
+        <!-- Start Meet Function using access_token -->
+        <script type="text/javascript">
+        function start_meet(access_token) {
+            var meet_options = {
+                iframe: true, //To open the meet in the same window within an iFrame.
+                // tab: true, //To open the meet in a new browser tab, N/A if iframe option is set to true.
+                tagid4iframe: "meet-container",
+                iframewidth: "1000px",
+                iframeheight: "750px",
+                extension: { 
+                    "show_dialogs": { "meet_invite": true } 
+                },
+                access_token: access_token,
+                start_meet: function(event) {
+                    console.log("Meet Started - session_id: "+event.session_id+"session_key: "+event.session_key);
+                    //Your application server can upload files to meet using the session_id and session_key
+                },
+                error: function(event) {
+                    console.log("error code: " + event.error_code + " message: " + event.error_message);
+                },
+                end_meet: function(event) {
+                    console.log("Meet Ended");
+                }
+            };
+            Moxtra.meet(meet_options);
+        }
+        </script>
+            
+    </head>
+    <body>
+        <h3><a id="getToken" href="javascript:get_token();">Moxtra Meet</a></h3>
+    </body>
     </html>
